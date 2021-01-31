@@ -2,7 +2,7 @@
 # Where to store logs/checkpoints
 
 tensorboard_log_dir: "log_dir"
-data_folder: "data"
+data_folder: "/kaggle/input/"
 checkpoints_folder: "checkpoints/srgan"
 
 
