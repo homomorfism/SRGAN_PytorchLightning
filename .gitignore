@@ -7,6 +7,8 @@ __pycache__/
 # C extensions
 *.so
 
+srgan_python
+
 # Distribution / packaging
 .Python
 build/

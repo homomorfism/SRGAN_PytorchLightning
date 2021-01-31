@@ -1,3 +1,32 @@
 
+# Where to store logs/checkpoints
+
 tensorboard_log_dir: "log_dir"
+data_folder: "data"
+checkpoints_folder: "checkpoints/srgan"
+
+
+# Image preprocess
+
+image_crop: 384
+downsampling_factor: 4
+
+
+num_res_block: 16
+
+adv_loss_rate: 1e-3
+
+adam_b: 0.9
+
+lr: 1e-4
+
+lr_step_size: 1e5
+
+lr_step: 0.1
+
+
+
+batch_size: 4
+
+num_workers: 8
 

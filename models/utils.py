@@ -1,5 +1,7 @@
 import pytorch_lightning as pl
+import torch.functional.F as F
 import torch.nn as nn
+from torchvision.models import vgg19
 
 
 class GeneratorResBlock(pl.LightningModule):
@@ -34,3 +36,27 @@ class DiscriminatorResBlock(pl.LightningModule):
 
     def forward(self, x):
         return self.model(x)
+
+
+class ContentLoss(pl.LightningModule):
+    # Add pixel-wise loss
+    def __init__(self):
+        super(ContentLoss, self).__init__()
+
+        self.vgg = vgg19(pretrained=True).eval().features
+        for layer in self.vgg:
+            layer.requires_grad_(False)
+
+    def forward(self, high_resolution_image, low_resolution_image):
+        return F.mse_loss(
+            self.vgg(high_resolution_image),
+            self.vgg(low_resolution_image)
+        )
+
+
+class AdversarialLoss(pl.LightningModule):
+    def __init__(self):
+        super(AdversarialLoss, self).__init__()
+
+    def forward(self, generator, discriminator, low_resolution_image):
+        return - discriminator(generator(low_resolution_image)).log().sum()
