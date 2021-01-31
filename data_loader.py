@@ -24,10 +24,8 @@ class ImageNetDataset(Dataset):
             transforms.ToTensor(),
         ])
 
-        self.dataset = self.dataset = datasets.ImageNet(
-            root=self.data_folder,
-            split='train',
-            download='True'
+        self.dataset = datasets.ImageFolder(
+            root=data_folder
         )
 
     def __getitem__(self, item):
@@ -52,7 +50,7 @@ class ImageNetDataLoader(pl.LightningDataModule):
         self.downsampling_factor = downsampling_factor
         self.batch_size = batch_size
 
-    def train_dataloader(self, ) -> DataLoader:
+    def train_dataloader(self) -> DataLoader:
         return DataLoader(
             dataset=ImageNetDataset(self.data_folder, self.image_crop, self.downsampling_factor),
             batch_size=self.batch_size,

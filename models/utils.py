@@ -1,6 +1,6 @@
 import pytorch_lightning as pl
-import torch.functional.F as F
 import torch.nn as nn
+from torch.functional import F
 from torchvision.models import vgg19
 
 
