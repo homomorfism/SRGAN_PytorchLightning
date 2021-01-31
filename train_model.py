@@ -12,7 +12,7 @@ from models.SRGAN import SRGAN
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', '-c', default='configs/conf.yaml')
+    parser.add_argument('--config', '-c', default='SRGAN_PytorchLightning/configs/conf.yaml')
     parser.add_argument('--resume', help='resume from the latest checkpoint', action='store_true')
     args = parser.parse_args()
 
