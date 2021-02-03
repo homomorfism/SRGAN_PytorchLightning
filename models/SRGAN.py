@@ -16,6 +16,8 @@ class SRGAN(pl.LightningModule):
         super(SRGAN, self).__init__()
         self.config = config
 
+        print(f"config={config}")
+
         self.content_loss = ContentLoss()
         self.adversarial_loss = AdversarialLoss()
 
@@ -61,9 +63,9 @@ class SRGAN(pl.LightningModule):
         if optimizer_idx == 0 and self.train_step % 100 == 0:
             generated_images = self.generator(lr_image)
 
-            grid_source_images = torchvision.utils.make_grid(hr_image.item(), normalize=True, nrow=4)
-            grid_lr_images = torchvision.utils.make_grid(lr_image.items(), normalize=True, nrow=4)
-            grid_generated_images = torchvision.utils.make_grid(generated_images.item(), normalize=True, nrow=4)
+            grid_source_images = torchvision.utils.make_grid(hr_image, normalize=True, nrow=4)
+            grid_lr_images = torchvision.utils.make_grid(lr_image, normalize=True, nrow=4)
+            grid_generated_images = torchvision.utils.make_grid(generated_images, normalize=True, nrow=4)
 
             self.logger.experiment.add_image('Real images: Train stage', grid_source_images, self.train_step)
             self.logger.experiment.add_image('Generated images : Train stage', grid_generated_images, self.train_step)

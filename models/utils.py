@@ -43,14 +43,16 @@ class ContentLoss(pl.LightningModule):
     def __init__(self):
         super(ContentLoss, self).__init__()
 
-        self.vgg = vgg19(pretrained=True).eval().features
-        for layer in self.vgg:
-            layer.requires_grad_(False)
+        model = vgg19(pretrained=True)
+        self.features = nn.Sequential(*list(model.features.children())[:36]).eval()
+        # Freeze parameters. Don't train.
+        for name, param in self.features.named_parameters():
+            param.requires_grad = False
 
-    def forward(self, high_resolution_image, low_resolution_image):
+    def forward(self, input_tensor, target_tensor):
         return F.mse_loss(
-            self.vgg(high_resolution_image),
-            self.vgg(low_resolution_image)
+            self.features(input_tensor),
+            self.features(target_tensor)
         )
 
 

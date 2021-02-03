@@ -11,15 +11,15 @@ class ImageNetDataset(Dataset):
 
         # [-1, 1]
         self.hr_transform = transforms.Compose([
-            transforms.ToPILImage(),
-            transforms.RandomCrop(image_crop),
+            # transforms.ToPILImage(),
+            transforms.Resize(image_crop),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.0, 0.0, 0.0], std=[1.0, 1.0, 1.0])
         ])
 
         self.lr_transform = transforms.Compose([
-            transforms.ToPILImage(),
-            transforms.RandomCrop(image_crop),
+            # transforms.ToPILImage(),
+            transforms.Resize(image_crop),
             transforms.Resize(image_crop // downsampling_factor),
             transforms.ToTensor(),
         ])
