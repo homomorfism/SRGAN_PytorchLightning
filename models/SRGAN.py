@@ -41,10 +41,10 @@ class SRGAN(pl.LightningModule):
 
         discriminator_fake_outputs = self.discriminator(self.generator(low_resolution_image))
         adversarial_loss = self.adversarial_loss(discriminator_fake_outputs)
-        self.logger('adversarial_loss', adversarial_loss.item())
+        self.log('adversarial_loss', adversarial_loss.item())
 
         content_loss = self.content_loss(self.generator(low_resolution_image), high_resolution_image)
-        self.logger('content_loss', content_loss.item())
+        self.log('content_loss', content_loss.item())
 
         g_loss = content_loss + self.config['adv_loss_rate'] * adversarial_loss
 

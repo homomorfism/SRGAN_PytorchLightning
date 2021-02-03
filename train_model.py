@@ -24,7 +24,7 @@ def main():
         save_last=True,
         save_top_k=1,
         verbose=True,
-        monitor='gen_loss',
+        monitor='generator_loss',
         mode='min'
     )
 
