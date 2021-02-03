@@ -14,7 +14,7 @@ class ImageNetDataset(Dataset):
             # transforms.ToPILImage(),
             transforms.Resize(size=(image_crop, image_crop)),
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.0, 0.0, 0.0], std=[1.0, 1.0, 1.0])
+            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
         ])
 
         self.lr_transform = transforms.Compose([

@@ -26,7 +26,8 @@ lr_step: 0.1
 
 
 
-batch_size: 4
+batch_size: 6
 
-num_workers: 4
+num_workers: 16
 
+vgg_coef: 0.006

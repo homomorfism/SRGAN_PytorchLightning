@@ -18,7 +18,7 @@ class SRGAN(pl.LightningModule):
 
         print(f"config={config}")
 
-        self.content_loss = ContentLoss()
+        self.content_loss = ContentLoss(config['vgg_coef'])
         self.adversarial_loss = AdversarialLoss()
 
         self.generator = Generator(num_res_blocks=config['num_res_block'])
@@ -28,7 +28,7 @@ class SRGAN(pl.LightningModule):
 
     def configure_optimizers(self):
 
-        optim_generator = Adam(self.generator.parameters(), lr=self.config['lr'])
+        optim_generator = Adam(self.generator.parameters(), lr=self.config['lr'], )
         optim_discriminator = Adam(self.discriminator.parameters(), lr=self.config['lr'])
 
         sched_generator = StepLR(optim_generator, step_size=self.config['lr_step_size'], gamma=self.config['lr_step'])
@@ -67,23 +67,28 @@ class SRGAN(pl.LightningModule):
         # print(f"lr shape={lr_image.shape}")  # lr shape = torch.Size([1, 3, 384, 384])
         # print(f"hr shape={hr_image.shape}")  # hr shape = torch.Size([1, 3, 96, 96])
 
-        # print(f"Range values in lr_image is {torch.min(lr_image)} - {torch.max(lr_image)}") # 0.0 - 1.0
-        # print(f"Range values in hr_image is {torch.min(hr_image)} - {torch.max(hr_image)}") # 0.0 - 1.0
+        # print(f"Range values in lr_image is {torch.min(lr_image)} - {torch.max(lr_image)}")  # 0.0 - 1.0
+        # print(f"Range values in hr_image is {torch.min(hr_image)} - {torch.max(hr_image)}")  # -1.0 - 1.0
 
         # Collect log images each 100 iterations
         if optimizer_idx == 0 and self.train_step % 100 == 0:
             generated_images = self.generator(lr_image)
 
-            grid_source_images = torchvision.utils.make_grid(hr_image, normalize=True, nrow=4)
-            grid_lr_images = torchvision.utils.make_grid(lr_image, normalize=True, nrow=4)
-            grid_generated_images = torchvision.utils.make_grid(generated_images, normalize=True, nrow=4)
+            grid_source_images = torchvision.utils.make_grid(hr_image, normalize=True, nrow=self.config['batch_size'])
+            grid_lr_images = torchvision.utils.make_grid(lr_image, normalize=True, nrow=self.config['batch_size'])
+            grid_generated_images = torchvision.utils.make_grid(generated_images, normalize=True,
+                                                                nrow=self.config['batch_size'])
 
             self.logger.experiment.add_image('Real images: Train stage', grid_source_images, self.train_step)
             self.logger.experiment.add_image('Generated images : Train stage', grid_generated_images, self.train_step)
             self.logger.experiment.add_image('Low resolution images : Train stage', grid_lr_images, self.train_step)
 
+            print("added images")
+
         # Generator step
         if optimizer_idx == 0:
+            self.train_step += 1  # Each 100 iter logs images
+
             gen_loss = self.generator_loss(lr_image, hr_image)
 
             self.log('generator_loss', gen_loss.item())

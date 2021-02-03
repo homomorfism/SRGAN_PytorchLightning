@@ -38,8 +38,10 @@ class DiscriminatorResBlock(pl.LightningModule):
 
 class ContentLoss(pl.LightningModule):
     # Add pixel-wise loss
-    def __init__(self):
+    def __init__(self, vgg_coef):
         super(ContentLoss, self).__init__()
+
+        self.vgg_coef = vgg_coef
 
         model = vgg19(pretrained=True)
         self.features = nn.Sequential(*list(model.features.children())[:36]).eval()
