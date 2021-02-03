@@ -39,18 +39,23 @@ class SRGAN(pl.LightningModule):
 
     def generator_loss(self, low_resolution_image, high_resolution_image):
 
-        g_loss = self.content_loss(low_resolution_image, high_resolution_image) + \
-                 self.config['adv_loss_rate'] * self.adversarial_loss(self.generator, self.discriminator,
-                                                                      low_resolution_image)
+        discriminator_fake_outputs = self.discriminator(self.generator(low_resolution_image))
+        adversarial_loss = self.adversarial_loss(discriminator_fake_outputs)
+        self.logger('adversarial_loss', adversarial_loss.item())
+
+        content_loss = self.content_loss(self.generator(low_resolution_image), high_resolution_image)
+        self.logger('content_loss', content_loss.item())
+
+        g_loss = content_loss + self.config['adv_loss_rate'] * adversarial_loss
 
         return g_loss
 
     def discriminator_loss(self, lr_image, hr_image):
 
-        real_loss = torch.log(self.discriminator(hr_image))
-        fake_loss = torch.log(1 - self.discriminator(self.generator(lr_image)))
+        real_loss = torch.log(self.discriminator(hr_image)).mean()
+        fake_loss = torch.log(1 - self.discriminator(self.generator(lr_image))).mean()
 
-        return (real_loss + fake_loss) / 2
+        return - (real_loss + fake_loss) / 2
 
     def forward(self, x):
         return self.generator(x)
@@ -58,6 +63,12 @@ class SRGAN(pl.LightningModule):
     def training_step(self, batch, batch_idx, optimizer_idx):
 
         lr_image, hr_image = batch
+
+        # print(f"lr shape={lr_image.shape}")  # lr shape = torch.Size([1, 3, 384, 384])
+        # print(f"hr shape={hr_image.shape}")  # hr shape = torch.Size([1, 3, 96, 96])
+
+        # print(f"Range values in lr_image is {torch.min(lr_image)} - {torch.max(lr_image)}") # 0.0 - 1.0
+        # print(f"Range values in hr_image is {torch.min(hr_image)} - {torch.max(hr_image)}") # 0.0 - 1.0
 
         # Collect log images each 100 iterations
         if optimizer_idx == 0 and self.train_step % 100 == 0:
@@ -74,11 +85,13 @@ class SRGAN(pl.LightningModule):
         # Generator step
         if optimizer_idx == 0:
             gen_loss = self.generator_loss(lr_image, hr_image)
-            self.log('gen_loss', gen_loss.item())
+
+            self.log('generator_loss', gen_loss.item())
             return gen_loss
 
         # Discriminator loss
         else:
             disc_loss = self.discriminator_loss(lr_image, hr_image)
-            self.log('disc_loss', disc_loss.item())
+
+            self.log('discriminator_loss', disc_loss.item())
             return disc_loss

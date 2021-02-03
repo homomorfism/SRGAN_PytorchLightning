@@ -1,4 +1,5 @@
 import pytorch_lightning as pl
+import torch
 import torch.nn as nn
 
 from models.utils import GeneratorResBlock
@@ -14,7 +15,7 @@ class Generator(pl.LightningModule):
         )
 
         self.model = nn.Sequential(*[
-            GeneratorResBlock() for i in range(num_res_blocks)
+            GeneratorResBlock(channels=64) for i in range(num_res_blocks)
         ])
 
         self.after_training = nn.Sequential(
@@ -37,12 +38,9 @@ class Generator(pl.LightningModule):
     def forward(self, x):
         x = self.preprocess_data(x)
 
-        x_identity = nn.Identity()(x)
+        output = self.model(x)
+        output = self.after_training(output)
 
-        x = self.model(x)
-        x = self.after_training(x)
-        x += x_identity
+        output = self.output_model(x + output)
 
-        x = self.output_model(x)
-
-        return x
+        return (torch.tanh(output) + 1) / 2

@@ -12,14 +12,14 @@ class ImageNetDataset(Dataset):
         # [-1, 1]
         self.hr_transform = transforms.Compose([
             # transforms.ToPILImage(),
-            transforms.Resize(image_crop),
+            transforms.Resize(size=(image_crop, image_crop)),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.0, 0.0, 0.0], std=[1.0, 1.0, 1.0])
         ])
 
         self.lr_transform = transforms.Compose([
             # transforms.ToPILImage(),
-            transforms.Resize(image_crop),
+            transforms.Resize(size=(image_crop, image_crop)),
             transforms.Resize(image_crop // downsampling_factor),
             transforms.ToTensor(),
         ])
@@ -34,7 +34,7 @@ class ImageNetDataset(Dataset):
         hr = self.hr_transform(image)
         lr = self.lr_transform(image)
 
-        return hr, lr
+        return lr, hr
 
     def __len__(self):
         return len(self.dataset)

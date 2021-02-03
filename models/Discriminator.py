@@ -30,17 +30,18 @@ class Discriminator(pl.LightningModule):
             # idk, (-1, 512, 28, 28) -> (-1, 512, 1, 1),
             # it is right ?
             nn.AdaptiveAvgPool2d(1),
-            nn.Flatten(),
 
-            # may be change to 512 -> 1024
-            nn.Linear(in_features=512, out_features=1000),
+            # The same as Linear
+            nn.Conv2d(in_channels=512, out_channels=1024, kernel_size=1),
             nn.LeakyReLU(negative_slope=0.2),
-            nn.Linear(in_features=1000, out_features=1)
+            nn.Conv2d(in_channels=1024, out_channels=1, kernel_size=1)
         )
 
     def forward(self, x):
+        batch_size = x.size(0)
+
         x = self.preprocess_layer(x)
         x = self.features(x)
         x = self.classificator(x)
 
-        return torch.sigmoid(x)
+        return torch.sigmoid(x.view(batch_size))

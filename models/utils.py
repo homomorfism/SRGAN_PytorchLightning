@@ -5,23 +5,21 @@ from torchvision.models import vgg19
 
 
 class GeneratorResBlock(pl.LightningModule):
-    def __init__(self):
+    def __init__(self, channels):
         super(GeneratorResBlock, self).__init__()
 
         self.model = nn.Sequential(
-            nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(num_features=64),
+            nn.Conv2d(in_channels=channels, out_channels=channels, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(num_features=channels),
             nn.PReLU(),
-            nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(num_features=64),
+            nn.Conv2d(in_channels=channels, out_channels=channels, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(num_features=channels),
         )
 
     def forward(self, x):
-        # Change to .clone()
-        tmp = nn.Identity()(x)
         output = self.model(x)
 
-        return output + tmp
+        return output + x
 
 
 class DiscriminatorResBlock(pl.LightningModule):
@@ -50,6 +48,9 @@ class ContentLoss(pl.LightningModule):
             param.requires_grad = False
 
     def forward(self, input_tensor, target_tensor):
+        # print(f"input feature shape={input_tensor.shape}")
+        # print(f"target image shape={target_tensor.shape}")
+
         return F.mse_loss(
             self.features(input_tensor),
             self.features(target_tensor)
@@ -60,5 +61,5 @@ class AdversarialLoss(pl.LightningModule):
     def __init__(self):
         super(AdversarialLoss, self).__init__()
 
-    def forward(self, generator, discriminator, low_resolution_image):
-        return - discriminator(generator(low_resolution_image)).log().sum()
+    def forward(self, discriminator_fake_outputs):
+        return - discriminator_fake_outputs.log().sum()
