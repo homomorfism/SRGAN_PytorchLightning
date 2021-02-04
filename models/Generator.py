@@ -1,5 +1,4 @@
 import pytorch_lightning as pl
-import torch
 import torch.nn as nn
 
 from models.utils import GeneratorResBlock
@@ -43,4 +42,5 @@ class Generator(pl.LightningModule):
 
         output = self.output_model(x + output)
 
-        return (torch.tanh(output) + 1) / 2
+        # return (torch.tanh(output) + 1) / 2
+        return output

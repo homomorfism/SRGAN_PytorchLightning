@@ -49,7 +49,8 @@ def main():
             gpus=1,
             logger=logger,
             callbacks=[checkpoint_callback],
-            resume_from_checkpoint=os.path.join(config['checkpoints_folder'], 'last.ckpt')
+            resume_from_checkpoint=os.path.join(config['checkpoints_folder'], 'last.ckpt'),
+            accumulate_grad_batches=config['accumulate_grad_batches']
         )
 
     else:
@@ -59,6 +60,7 @@ def main():
             gpus=1,
             logger=logger,
             callbacks=[checkpoint_callback],
+            accumulate_grad_batches=config['accumulate_grad_batches']
         )
 
     trainer.fit(model, train_loader)

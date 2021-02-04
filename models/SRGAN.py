@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import pytorch_lightning as pl
 import torch
 import torchvision
@@ -25,6 +26,8 @@ class SRGAN(pl.LightningModule):
         self.discriminator = Discriminator()
 
         self.train_step = 0
+
+        self.execute_once = True
 
     def configure_optimizers(self):
 
@@ -64,11 +67,16 @@ class SRGAN(pl.LightningModule):
 
         lr_image, hr_image = batch
 
-        # print(f"lr shape={lr_image.shape}")  # lr shape = torch.Size([1, 3, 384, 384])
-        # print(f"hr shape={hr_image.shape}")  # hr shape = torch.Size([1, 3, 96, 96])
+        if self.execute_once:
+            print(f"lr shape={lr_image.shape}")  # lr shape = torch.Size([1, 3, 384, 384])
+            print(f"hr shape={hr_image.shape}")  # hr shape = torch.Size([1, 3, 96, 96])
 
-        # print(f"Range values in lr_image is {torch.min(lr_image)} - {torch.max(lr_image)}")  # 0.0 - 1.0
-        # print(f"Range values in hr_image is {torch.min(hr_image)} - {torch.max(hr_image)}")  # -1.0 - 1.0
+            print(f"Range values in lr_image is ({torch.min(lr_image)}) - ({torch.max(lr_image)})")  # 0.0 - 1.0
+            print(f"Range values in hr_image is ({torch.min(hr_image)}) - ({torch.max(hr_image)})")  # -1.0 - 1.0
+
+            plt.show()
+
+            self.execute_once = False
 
         # Collect log images each 100 iterations
         if optimizer_idx == 0 and self.train_step % 100 == 0:
@@ -82,8 +90,6 @@ class SRGAN(pl.LightningModule):
             self.logger.experiment.add_image('Real images: Train stage', grid_source_images, self.train_step)
             self.logger.experiment.add_image('Generated images : Train stage', grid_generated_images, self.train_step)
             self.logger.experiment.add_image('Low resolution images : Train stage', grid_lr_images, self.train_step)
-
-            print("added images")
 
         # Generator step
         if optimizer_idx == 0:

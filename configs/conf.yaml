@@ -8,7 +8,7 @@ checkpoints_folder: "checkpoints/srgan"
 
 # Image preprocess
 
-image_crop: 384
+image_crop: 216
 downsampling_factor: 4
 
 
@@ -26,8 +26,10 @@ lr_step: 0.1
 
 
 
-batch_size: 6
+batch_size: 16
 
 num_workers: 16
 
 vgg_coef: 0.006
+
+accumulate_grad_batches: 2
