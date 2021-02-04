@@ -70,6 +70,7 @@ class SRGAN(pl.LightningModule):
         if self.execute_once:
             print(f"lr shape={lr_image.shape}")  # lr shape = torch.Size([1, 3, 384, 384])
             print(f"hr shape={hr_image.shape}")  # hr shape = torch.Size([1, 3, 96, 96])
+            print(f"gen shape={self.generator(lr_image).shape}")
 
             print(f"Range values in lr_image is ({torch.min(lr_image)}) - ({torch.max(lr_image)})")  # 0.0 - 1.0
             print(f"Range values in hr_image is ({torch.min(hr_image)}) - ({torch.max(hr_image)})")  # -1.0 - 1.0

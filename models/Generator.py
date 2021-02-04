@@ -9,7 +9,8 @@ class Generator(pl.LightningModule):
         super(Generator, self).__init__()
 
         self.preprocess_data = nn.Sequential(
-            nn.Conv2d(in_channels=3, out_channels=64, kernel_size=9, stride=1, padding=4),
+            # Attention - input pic is small, that why kernel size:  9 -> 5
+            nn.Conv2d(in_channels=3, out_channels=64, kernel_size=5, stride=1, padding=2),
             nn.PReLU()
         )
 
@@ -31,7 +32,8 @@ class Generator(pl.LightningModule):
             nn.PixelShuffle(upscale_factor=2),
             nn.PReLU(),
 
-            nn.Conv2d(in_channels=64, out_channels=3, kernel_size=9, stride=1, padding=4),
+            # Attention - input pic is small, that why kernel size:  9 -> 5
+            nn.Conv2d(in_channels=64, out_channels=3, kernel_size=5, stride=1, padding=2),
         )
 
     def forward(self, x):
@@ -42,5 +44,6 @@ class Generator(pl.LightningModule):
 
         output = self.output_model(x + output)
 
+        # Like in article
         # return (torch.tanh(output) + 1) / 2
         return output
