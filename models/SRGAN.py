@@ -83,14 +83,34 @@ class SRGAN(pl.LightningModule):
         if optimizer_idx == 0 and self.train_step % 100 == 0:
             generated_images = self.generator(lr_image)
 
-            grid_source_images = torchvision.utils.make_grid(hr_image, normalize=True, nrow=self.config['batch_size'])
-            grid_lr_images = torchvision.utils.make_grid(lr_image, normalize=True, nrow=self.config['batch_size'])
-            grid_generated_images = torchvision.utils.make_grid(generated_images, normalize=True,
-                                                                nrow=self.config['batch_size'])
+            generated_images_vs_source = []
+            generated_images_vs_bicubic = []
 
-            self.logger.experiment.add_image('Real images: Train stage', grid_source_images, self.train_step)
-            self.logger.experiment.add_image('Generated images : Train stage', grid_generated_images, self.train_step)
+            for i in range(self.config['batch_size'] // 2):
+                image_crop, scale_factor = self.config['image_crop'], self.config['downsampling_factor']
+                lr_shape = (image_crop // scale_factor, image_crop // scale_factor)
+
+                bicubic = torch.nn.Upsample(scale_factor=scale_factor, mode='bicubic')
+
+                generated_images_vs_source.append(generated_images[i])
+                generated_images_vs_source.append(hr_image[i])
+                generated_images_vs_bicubic.append(generated_images[i])
+                generated_images_vs_bicubic.append(bicubic(lr_image)[i])
+
+            grid_generated_images_vs_source = torchvision.utils.make_grid(
+                generated_images_vs_source, normalize=True, nrow=len(generated_images_vs_source)
+            )
+            grid_generated_images_vs_bicubic = torchvision.utils.make_grid(
+                generated_images_vs_bicubic, normalize=True, nrow=len(generated_images_vs_bicubic)
+            )
+
+            grid_lr_images = torchvision.utils.make_grid(lr_image, normalize=True, nrow=self.config['batch_size'])
+
             self.logger.experiment.add_image('Low resolution images : Train stage', grid_lr_images, self.train_step)
+            self.logger.experiment.add_image('Generated images vs source : Train stage',
+                                             grid_generated_images_vs_source, self.train_step)
+            self.logger.experiment.add_image("Generated images vs bicubic lr images : Train stage",
+                                             grid_generated_images_vs_bicubic, self.train_step)
 
         # Generator step
         if optimizer_idx == 0:

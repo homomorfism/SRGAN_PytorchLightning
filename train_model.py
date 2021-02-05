@@ -13,7 +13,7 @@ from models.SRGAN import SRGAN
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', '-c', default='configs/conf.yaml')
-    parser.add_argument('--resume', help='resume from the latest checkpoint', action='store_true')
+    parser.add_argument('--resume', help='resume from the latest checkpoint', default='srgan-v0.ckpt')
     args = parser.parse_args()
 
     with open(args.config) as f:
@@ -49,8 +49,9 @@ def main():
             gpus=1,
             logger=logger,
             callbacks=[checkpoint_callback],
-            resume_from_checkpoint=os.path.join(config['checkpoints_folder'], 'last.ckpt'),
-            accumulate_grad_batches=config['accumulate_grad_batches']
+            resume_from_checkpoint=os.path.join(config['checkpoints_folder'], args.resume),
+            accumulate_grad_batches=config['accumulate_grad_batches'],
+
         )
 
     else:
