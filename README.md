@@ -10,10 +10,10 @@ Run tensorboard for collecting logs:
 
 To run program:
 
-- from a checkpoint: ```bash clear && nohup python train_model.py --resume checkpoints/last.ckpt```
+- from a checkpoint: ```bash clear && nohup python train_model.py --resume checkpoints/xxx.ckpt```
 - from a scratch: ```bash clear && nohup python train_model.py &```
 
 Temp pictures (from training):
 
-![pic](images/pic.jpg)
+![pic](images/pic.png)
 
