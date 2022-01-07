@@ -1,5 +1,5 @@
-pytorch_lightning==1.1.6
-torch==1.7.1
-matplotlib==3.3.4
-torchvision==0.8.2
-PyYAML==5.4.1
+pytorch_lightning
+torch
+matplotlib
+torchvision
+PyYAML
